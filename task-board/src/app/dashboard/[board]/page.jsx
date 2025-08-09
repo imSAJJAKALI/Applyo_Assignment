@@ -20,16 +20,19 @@ export default function TaskPage() {
   const [editTaskData, setEditTaskData] = useState(null);
 
   useEffect(() => {
-    const token = document.cookie.includes('token') || localStorage.getItem('token');
-    if (!token) {
+  const checkAuth = async () => {
+    try {
+      await axios.get('/api/auth/verify', { withCredentials: true });
+      setIsAuthenticated(true);
+      fetchTasks();
+    } catch (error) {
       toast.error('You must be logged in to view this page');
       router.push('/login');
-      return;
     }
-    setIsAuthenticated(true);
+  };
+  checkAuth();
+}, [boardId]);
 
-    fetchTasks();
-  }, [boardId]);
 
   const fetchTasks = async () => {
     try {
